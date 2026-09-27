@@ -1,8 +1,5 @@
-from datetime import timezone as dt_timezone
-
 from django import forms
 from django.utils import timezone
-from django.utils.timezone import make_aware
 
 from .models import CookRun, FireHearth, ResinLot, SoftPointProbe
 from .services.floor_rules import assert_can_enter_drawing
@@ -110,8 +107,8 @@ class OpenCookRunForm(forms.ModelForm):
         if value is None:
             return value
         if timezone.is_naive(value):
-            return make_aware(value, timezone=dt_timezone.utc)
-        return value.astimezone(dt_timezone.utc)
+            return timezone.make_aware(value, timezone.get_current_timezone())
+        return value
 
     def clean(self):
         cleaned = super().clean()
