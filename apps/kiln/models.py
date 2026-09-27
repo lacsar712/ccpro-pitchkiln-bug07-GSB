@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class ResinLot(models.Model):
@@ -82,7 +83,8 @@ class CookRun(models.Model):
         verbose_name_plural = "熬制值守"
 
     def __str__(self):
-        return f"{self.hearth.tag} @ {self.openedAt:%Y-%m-%d %H:%M}"
+        local = timezone.localtime(self.openedAt)
+        return f"{self.hearth.tag} @ {local:%Y-%m-%d %H:%M}"
 
     @property
     def is_open(self):

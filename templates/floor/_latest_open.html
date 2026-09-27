@@ -1,0 +1,6 @@
+{% load kiln_time %}
+{% if latest_opened_at %}
+<p class="board-sub" id="latest-opened">最近开灶 · {{ latest_opened_tag }} · {{ latest_opened_at|wall_clock }}</p>
+{% else %}
+<p class="board-sub" id="latest-opened">最近开灶 · 暂无进行中的值守</p>
+{% endif %}

@@ -6,9 +6,11 @@
   <div>
     <h1>灶台值守看板</h1>
     <p class="board-sub">按过道排布 · 点灶牌开右侧抽屉</p>
-    {% if latest_opened_at %}
-    <p class="board-sub">最近开灶 · {{ latest_opened_tag }} · {{ latest_opened_at|wall_clock }}</p>
-    {% endif %}
+    <div hx-get="{% url 'latest_open' %}"
+         hx-trigger="floor-refresh from:body"
+         hx-swap="innerHTML">
+      {% include "floor/_latest_open.html" %}
+    </div>
   </div>
   <div class="phase-legend">
     {% for key, label, count in phase_legend %}

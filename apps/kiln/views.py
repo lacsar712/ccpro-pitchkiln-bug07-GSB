@@ -23,7 +23,8 @@ def _hearths_for_board():
             "runs",
             queryset=CookRun.objects.filter(closedAt__isnull=True)
             .select_related("resinLot")
-            .prefetch_related("probes"),
+            .prefetch_related("probes")
+            .order_by("-openedAt", "-id"),
             to_attr="open_runs_cache",
         )
     ).order_by("lane", "tag")
@@ -36,7 +37,9 @@ def _board_context():
         cache = getattr(h, "open_runs_cache", None) or []
         if cache:
             open_runs.append(cache[0])
-    open_runs.sort(key=lambda r: r.openedAt, reverse=True)
+    # 与 CookRun.Meta.ordering / open_run() 同口径：openedAt 相同时以 id 兜底，
+    # 保证“排序第一灶”恒等于下方取到的 latest_open（看板最近开灶）。
+    open_runs.sort(key=lambda r: (r.openedAt, r.id), reverse=True)
     ordered_tags = [r.hearth_id for r in open_runs]
     hearths.sort(
         key=lambda h: (
@@ -96,6 +99,13 @@ def home(request):
 @login_required
 def floor_grid_partial(request):
     html = render_to_string("floor/_grid.html", _board_context(), request=request)
+    return HttpResponse(html)
+
+
+@login_required
+def latest_open_partial(request):
+    ctx = _board_context()
+    html = render_to_string("floor/_latest_open.html", ctx, request=request)
     return HttpResponse(html)
 
 
